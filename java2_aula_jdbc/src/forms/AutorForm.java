@@ -5,6 +5,10 @@
  */
 package forms;
 
+import dao.AutorDAO;
+import javax.swing.JOptionPane;
+import model.Autor;
+
 /**
  *
  * @author tiagoseibel
@@ -16,6 +20,12 @@ public class AutorForm extends javax.swing.JFrame {
      */
     public AutorForm() {
         initComponents();
+        // Instancia a classe DAO
+        try {
+            autorDAO = new AutorDAO();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
+        }
     }
 
     /**
@@ -46,6 +56,11 @@ public class AutorForm extends javax.swing.JFrame {
         btnNovo.setText("Novo");
 
         btnSalvar.setText("Salvar");
+        btnSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalvarActionPerformed(evt);
+            }
+        });
 
         btnRemover.setText("Remover");
 
@@ -114,6 +129,18 @@ public class AutorForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
+        Autor autor = new Autor();
+        autor.setAutor_id( Integer.parseInt( txtAutor_ID.getText() ) );
+        autor.setNome( txtNome.getText() );
+        
+        try {
+            autorDAO.save(autor);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
+        }
+    }//GEN-LAST:event_btnSalvarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -149,6 +176,7 @@ public class AutorForm extends javax.swing.JFrame {
         });
     }
 
+    private AutorDAO autorDAO;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnNovo;
     private javax.swing.JButton btnRemover;
