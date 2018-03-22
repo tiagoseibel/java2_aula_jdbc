@@ -6,7 +6,10 @@
 package forms;
 
 import dao.AutorDAO;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 import model.Autor;
 
 /**
@@ -48,12 +51,22 @@ public class AutorForm extends javax.swing.JFrame {
         tabela = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         jLabel1.setText("Autor ID:");
 
         jLabel2.setText("Nome:");
 
         btnNovo.setText("Novo");
+        btnNovo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNovoActionPerformed(evt);
+            }
+        });
 
         btnSalvar.setText("Salvar");
         btnSalvar.addActionListener(new java.awt.event.ActionListener() {
@@ -63,6 +76,11 @@ public class AutorForm extends javax.swing.JFrame {
         });
 
         btnRemover.setText("Remover");
+        btnRemover.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoverActionPerformed(evt);
+            }
+        });
 
         tabela.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -75,6 +93,11 @@ public class AutorForm extends javax.swing.JFrame {
                 "ID", "Nome"
             }
         ));
+        tabela.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabelaMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tabela);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -131,20 +154,81 @@ public class AutorForm extends javax.swing.JFrame {
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         Autor autor = new Autor();
-        autor.setAutor_id( Integer.parseInt( txtAutor_ID.getText() ) );
-        autor.setNome( txtNome.getText() );
-        
+        autor.setAutor_id(Integer.parseInt(txtAutor_ID.getText()));
+        autor.setNome(txtNome.getText());
+
         try {
-            if ( mode.equals("INS") ) {
+            if (mode.equals("INS")) {
                 autorDAO.save(autor);
-                
-            } else if ( mode.equals("UPD") ) {
+
+            } else if (mode.equals("UPD")) {
                 autorDAO.update(autor);
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage());
         }
+        listar();
     }//GEN-LAST:event_btnSalvarActionPerformed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        listar();
+    }//GEN-LAST:event_formWindowOpened
+
+    private void tabelaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelaMouseClicked
+        int selected = tabela.getSelectedRow();
+        txtAutor_ID.setText(tabela.getValueAt(selected, 0).toString());
+        txtNome.setText(tabela.getValueAt(selected, 1).toString());
+
+        // modo
+        this.mode = "UPD";
+        txtAutor_ID.setEnabled(false);
+
+    }//GEN-LAST:event_tabelaMouseClicked
+
+    private void btnNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoActionPerformed
+        txtAutor_ID.setText("");
+        txtNome.setText("");
+        this.mode = "INS";
+        txtAutor_ID.setEnabled(true);
+    }//GEN-LAST:event_btnNovoActionPerformed
+
+    private void btnRemoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoverActionPerformed
+
+        int opt = JOptionPane.showConfirmDialog(this, "Excluir registro?");
+
+        if (opt == JOptionPane.YES_OPTION) {
+            Autor autor = new Autor();
+            autor.setAutor_id(Integer.parseInt(txtAutor_ID.getText()));
+
+            try {
+                autorDAO.delete(autor);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+            }
+
+            txtAutor_ID.setText("");
+            txtNome.setText("");
+            this.mode = "INS";
+            txtAutor_ID.setEnabled(true);
+
+            listar();
+        }
+    }//GEN-LAST:event_btnRemoverActionPerformed
+
+    public void listar() {
+        DefaultTableModel model = (DefaultTableModel) tabela.getModel();
+        // Limpar JTable
+        model.setNumRows(0);
+        try {
+            // Busca lista de objetos
+            for (Autor autor : autorDAO.findAll()) {
+                String linha[] = {"" + autor.getAutor_id(), autor.getNome()};
+                model.addRow(linha);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
+        }
+    }
 
     /**
      * @param args the command line arguments
