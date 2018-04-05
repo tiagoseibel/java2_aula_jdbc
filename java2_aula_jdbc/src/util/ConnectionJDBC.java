@@ -25,7 +25,7 @@ public class ConnectionJDBC {
              * Conectar ao Banco de Dados URL:
              * jdbc:nomeDoProduto:servidor:porta:nomeDoBanco
              */
-            String ip = "192.168.56.101";
+            String ip = "192.168.56.102";
             String database = "/databases/aula07.fdb";
             String url = "jdbc:firebirdsql:" + ip + "/3050:" + database;
             String usuario = "SYSDBA";

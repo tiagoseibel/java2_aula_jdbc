@@ -26,7 +26,7 @@ public class LivroDAO {
         try {
             PreparedStatement p = connection.prepareStatement(SQL);
             p.setInt(1, livro.getLivro_id());
-            p.setInt(2, livro.getEditora().getEditora_id() );
+            p.setInt(2, livro.getEditora().getEditora_id());
             p.setString(3, livro.getTitulo());
             p.setInt(4, livro.getAno());
             p.setString(5, livro.getDescricao());
@@ -41,9 +41,9 @@ public class LivroDAO {
         try {
             PreparedStatement p = connection.prepareStatement(SQL);
             p.setInt(1, livro.getEditora().getEditora_id());
-            p.setString(2, livro.getTitulo() );
+            p.setString(2, livro.getTitulo());
             p.setInt(3, livro.getAno());
-            p.setString(4, livro.getDescricao() );
+            p.setString(4, livro.getDescricao());
             p.setInt(5, livro.getLivro_id());
             p.execute();
         } catch (SQLException ex) {
@@ -62,8 +62,39 @@ public class LivroDAO {
         }
     }
 
-    public Livro findById(int id) {
-        return new Livro();
+    public Livro findById(int id) throws Exception {
+        Livro objeto = new Livro();
+        String SQL = "SELECT L.*,E.NOME FROM LIVRO L "
+                + "INNER JOIN EDITORA E ON E.EDITORA_ID = L.EDITORA_ID "
+                + "WHERE LIVRO_ID = ?";
+        try {
+            // Prepara a SQL
+            PreparedStatement p = connection.prepareStatement(SQL);
+            p.setInt(1, id);
+            // Executa a SQL e mantem os valores no ResultSet rs
+            ResultSet rs = p.executeQuery();
+            // Navega pelos registros no rs
+            while (rs.next()) {
+                // Instancia a classe e informa os valores do BD
+                objeto = new Livro();
+                objeto.setLivro_id(rs.getInt("livro_id"));
+                objeto.setTitulo(rs.getString("titulo"));
+                objeto.setAno(rs.getInt("ano"));
+                objeto.setDescricao(rs.getString("descricao"));
+
+                Editora editora = new Editora();
+                editora.setEditora_id(rs.getInt("editora_id"));
+                editora.setNome(rs.getString("nome"));
+
+                objeto.setEditora(editora);
+            }
+            rs.close();
+            p.close();
+        } catch (SQLException ex) {
+            throw new Exception(ex);
+        }
+
+        return objeto;
     }
 
     public List<Livro> findAll() throws Exception {
@@ -71,7 +102,7 @@ public class LivroDAO {
         List<Livro> list = new ArrayList<>();
         Livro objeto;
         String SQL = "SELECT L.*,E.NOME FROM LIVRO L "
-                   + "INNER JOIN EDITORA E ON E.EDITORA_ID = L.EDITORA_ID";
+                + "INNER JOIN EDITORA E ON E.EDITORA_ID = L.EDITORA_ID";
         try {
             // Prepara a SQL
             PreparedStatement p = connection.prepareStatement(SQL);
@@ -83,15 +114,15 @@ public class LivroDAO {
                 objeto = new Livro();
                 objeto.setLivro_id(rs.getInt("livro_id"));
                 objeto.setTitulo(rs.getString("titulo"));
-                objeto.setAno( rs.getInt("ano") );
-                objeto.setDescricao( rs.getString("descricao") );
-                
+                objeto.setAno(rs.getInt("ano"));
+                objeto.setDescricao(rs.getString("descricao"));
+
                 Editora editora = new Editora();
-                editora.setEditora_id( rs.getInt("editora_id") );
+                editora.setEditora_id(rs.getInt("editora_id"));
                 editora.setNome(rs.getString("nome"));
-                
+
                 objeto.setEditora(editora);
-                
+
                 // Inclui na lista
                 list.add(objeto);
             }
@@ -103,7 +134,7 @@ public class LivroDAO {
         // Retorna a lista
         return list;
     }
-    
+
     public static void main(String[] args) {
         try {
             new LivroDAO().findAll();
@@ -111,5 +142,5 @@ public class LivroDAO {
             Logger.getLogger(LivroDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
 }
