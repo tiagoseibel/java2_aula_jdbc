@@ -134,13 +134,4 @@ public class LivroDAO {
         // Retorna a lista
         return list;
     }
-
-    public static void main(String[] args) {
-        try {
-            new LivroDAO().findAll();
-        } catch (Exception ex) {
-            Logger.getLogger(LivroDAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
 }
