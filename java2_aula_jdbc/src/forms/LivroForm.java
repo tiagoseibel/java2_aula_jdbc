@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import model.Autor;
 import model.Editora;
 import model.Livro;
 
@@ -111,7 +112,11 @@ public class LivroForm extends javax.swing.JFrame {
         txtAutorID.setEnabled(false);
 
         btnAddAutor.setText("Add");
-        btnAddAutor.setEnabled(false);
+        btnAddAutor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddAutorActionPerformed(evt);
+            }
+        });
 
         btnRemoveAutor.setText("Del");
         btnRemoveAutor.setEnabled(false);
@@ -282,17 +287,45 @@ public class LivroForm extends javax.swing.JFrame {
             //cbEditora.setSelectedItem( livro.getEditora() );
             cbEditora.getModel().setSelectedItem( livro.getEditora() );
             
+            loadTabelaAutores(livro);
+            
         } catch (Exception ex) {
             Logger.getLogger(LivroForm.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
     }//GEN-LAST:event_tabelaMouseClicked
 
+    private void loadTabelaAutores(Livro livro) throws Exception {
+        DefaultTableModel model = (DefaultTableModel) tabelaAutores.getModel();
+        model.setNumRows(0);
+        for (Autor autor : livro.getAutores() ) {
+            String[] linha = {
+              "" + autor.getAutor_id(),
+                autor.getNome()
+            };
+            model.addRow(linha);
+        }
+    }
+    
     private void btnBuscarAutorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarAutorActionPerformed
         AutorDialog dialog = new AutorDialog(this, true);
         dialog.setVisible(true);
         txtAutorID.setText("" + dialog.getAutorId() );
     }//GEN-LAST:event_btnBuscarAutorActionPerformed
+
+    private void btnAddAutorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAutorActionPerformed
+        Autor autor = new Autor();
+        Livro livro = new Livro();
+        autor.setAutor_id( Integer.parseInt( txtAutorID.getText() ) );
+        livro.setLivro_id( Integer.parseInt( txtLivroID.getText() ));
+        try {
+            livroDAO.saveAutorLivro(autor, livro);
+            
+            livro = livroDAO.findById( livro.getLivro_id() );
+            loadTabelaAutores(livro);
+        } catch (Exception ex) {
+            Logger.getLogger(LivroForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnAddAutorActionPerformed
 
     public void limparCampos() {
         txtLivroID.setText("");

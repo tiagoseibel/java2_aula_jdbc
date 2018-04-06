@@ -41,8 +41,8 @@ public class LivroDAO {
         String SQL = "INSERT INTO AUTOR_LIVRO VALUES (?, ?)";
         try {
             PreparedStatement p = connection.prepareStatement(SQL);
-            p.setInt(1, livro.getLivro_id() );
-            p.setInt(2, autor.getAutor_id() );
+            p.setInt(1, autor.getAutor_id());
+            p.setInt(2, livro.getLivro_id() );
             p.execute();
         } catch (SQLException ex) {
             throw new Exception(ex);
